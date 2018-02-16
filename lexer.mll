@@ -6,7 +6,10 @@
 rule token = parse
   | ' ' | '\t' { token lexbuf }
   | '\n' { EOL }
+  | '=' { Equal }
   | '\\' { Lambda }
+  | '(' { LParen }
+  | ')' { RParen }
   | '.' { Dot }
-  | ['a'-'z'] as c | ['A'-'Z'] as c { Ident(c) }
+  | ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* as s { Ident(s) }
   | eof { raise Eof }

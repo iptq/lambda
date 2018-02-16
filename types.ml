@@ -1,9 +1,10 @@
+type var = string
+
 type term =
-  | TmVar of char
-  | TmAbs of char * term
+  | Assign of string * term
+  | TmVar of var
+  | TmAbs of var * term
   | TmApp of term * term
 
-type binding = NameBind
-
-type context = (char * binding) list
+type context = (string * term) list
 

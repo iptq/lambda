@@ -4,7 +4,10 @@
 
 %token EOL
 %token Dot
-%token <char> Ident
+%token Equal
+%token LParen
+%token RParen
+%token <string> Ident
 %token Lambda
 
 %start main
@@ -12,12 +15,16 @@
 %%
 
 main:
-  expr EOL { $1 }
+  | assign EOL { $1 }
+  | expr EOL { $1 }
+;
+assign:
+  | Ident Equal expr { Types.Assign($1, $3) }
 ;
 expr:
   | var { Types.TmVar($1) }
   | Lambda var Dot expr { Types.TmAbs($2, $4) }
-  | expr expr { Types.TmApp ($1, $2) }
+  | LParen expr expr RParen { Types.TmApp ($2, $3) }
 ;
 var:
   Ident { $1 }
