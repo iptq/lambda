@@ -82,14 +82,15 @@ let rec eval (ctx, t) =
     if t = t' then raise EvaluationComplete else
     eval (ctx', t')
   with
-  | UnboundVariable v -> print_endline ("unbound variable " ^ v); raise (Failure "")
+  | UnboundVariable v -> raise (Failure ("unbound variable '" ^ v ^ "'"))
   | EvaluationComplete -> (ctx, t)
 
 let _ =
-  try
-    let rec loop ctx =
+  let rec loop ctx =
+    try
       print_string "> "; flush stdout;
-      let lexbuf = Lexing.from_channel stdin in
+      let line = input_line stdin in
+      let lexbuf = Lexing.from_string line in
       let x = Parser.main Lexer.token lexbuf in
       match x with
       | Types.Term t ->
@@ -99,7 +100,11 @@ let _ =
       | Types.Assign (n, t) ->
           let (ctx', r) = eval (ctx, t) in
             loop (assign ctx' (n, r))
-    in loop []
-  with Lexer.Eof ->
-    print_endline "^D";
-    exit 0
+    with
+    | Lexer.Eof ->
+        loop ctx
+    | End_of_file ->
+        print_endline "^D";
+        exit 0
+  in loop []
+

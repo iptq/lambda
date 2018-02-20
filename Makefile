@@ -23,6 +23,8 @@ clean:
 	rm -f lexer.ml parser.ml parser.mli
 	rm -f *.cmo *.cmi
 
-all: types.cmo lexer.cmo parser.cmo lambda.cmo
-	ocaml types.cmo parser.cmo lexer.cmo lambda.cmo
+lambda: types.cmo lexer.cmo parser.cmo lambda.cmo
+	ocamlc -o $@ $^
+
+all: lambda
 
