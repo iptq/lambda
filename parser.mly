@@ -10,8 +10,12 @@
 %token <string> Ident
 %token Lambda
 
+%right prec_Abs
+%left prec_App
+
 %start main
 %type <Types.input> main
+
 %%
 
 main:
@@ -22,12 +26,9 @@ assign:
   | Ident Equal expr { Types.Assign($1, $3) }
 ;
 expr:
-  | var { Types.TmVar($1) }
+  | Ident { Types.TmVar($1) }
   | LParen expr RParen { $2 }
-  | Lambda var Dot expr { Types.TmAbs($2, $4) }
-  | expr expr { Types.TmApp($1, $2) }
-;
-var:
-  Ident { $1 }
+  | Lambda Ident Dot expr %prec prec_Abs { Types.TmAbs($2, $4) }
+  | expr expr %prec prec_App { Types.TmApp($1, $2) }
 ;
 
