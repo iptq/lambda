@@ -3,6 +3,7 @@ open Lexing
 open Parser
 open Types
 
+exception UnboundVariable of string
 exception EvaluationComplete
 
 (*
@@ -31,7 +32,7 @@ let remove ctx name =
 
 let rec lookup ctx name : Types.term =
   match ctx with
-  | [] -> print_endline ("unbound variable " ^ name); raise (Failure ("unbound variable " ^ name))
+  | [] -> raise (UnboundVariable name)
   | (n, t)::tail ->
       if n = name then t else lookup tail name
 
@@ -71,12 +72,13 @@ let rec eval (ctx, t) =
         let (s, t') = try_subst n t r in
         (*print_endline ("try_subst('" ^ n ^ "', " ^ (string_of_term t) ^ ", " ^ (string_of_term r) ^ ") = " ^ (if s then "true" else "false"));*)
         if s then helper (ctx, t') (d + 1) else (ctx, t')
-    | _ -> (*print_endline "called EvaluationComplete"; *)raise EvaluationComplete
   in try
     let (ctx', t') = helper (ctx, t) 0 in
     if t = t' then raise EvaluationComplete else
     eval (ctx', t')
-  with EvaluationComplete -> (ctx, t)
+  with
+  | UnboundVariable v -> print_endline ("unbound variable " ^ v); raise (Failure "")
+  | EvaluationComplete -> (ctx, t)
 
 let _ =
   try
@@ -91,8 +93,7 @@ let _ =
             loop ctx'
       | Types.Assign (n, t) ->
           let (ctx', r) = eval (ctx, t) in
-            (* bind the name *)
-            loop ctx'
+            loop (assign ctx' (n, r))
     in loop []
   with Lexer.Eof ->
     print_endline "^D";

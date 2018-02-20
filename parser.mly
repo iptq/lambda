@@ -7,6 +7,7 @@
 %token Equal
 %token LParen
 %token RParen
+%token Let
 %token <string> Ident
 %token Lambda
 
@@ -23,7 +24,7 @@ main:
   | expr EOL { Types.Term($1) }
 ;
 assign:
-  | Ident Equal expr { Types.Assign($1, $3) }
+  | Let Ident Equal expr { Types.Assign($2, $4) }
 ;
 expr:
   | Ident { Types.TmVar($1) }

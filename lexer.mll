@@ -11,5 +11,6 @@ rule token = parse
   | '(' { LParen }
   | ')' { RParen }
   | '.' { Dot }
+  | "let" { Let }
   | ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '0'-'9' '_']* as s { Ident(s) }
   | eof { raise Eof }
