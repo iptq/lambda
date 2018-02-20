@@ -89,8 +89,7 @@ let _ =
   let rec loop ctx =
     try
       print_string "> "; flush stdout;
-      let line = input_line stdin in
-      let lexbuf = Lexing.from_string line in
+      let lexbuf = Lexing.from_channel stdin in
       let x = Parser.main Lexer.token lexbuf in
       match x with
       | Types.Term t ->
