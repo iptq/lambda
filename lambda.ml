@@ -19,6 +19,11 @@ let rec string_of_term (t: Types.term) =
       "(" ^ (string_of_term t1) ^ " " ^ (string_of_term t2) ^ ")"
   | TmVar(x) -> x
 
+let rec string_of_term_in_ctx ctx tm =
+  match ctx with
+  | [] -> (string_of_term tm)
+  | (n, t)::r -> if t = tm then n else (string_of_term_in_ctx r tm)
+
 let rec string_of_ctx (c: Types.context) =
   match c with
   | [] -> ""
@@ -89,7 +94,7 @@ let _ =
       match x with
       | Types.Term t ->
           let (ctx', r) = eval (ctx, t) in
-            print_endline (string_of_term r); flush stdout;
+            print_endline (string_of_term_in_ctx ctx r); flush stdout;
             loop ctx'
       | Types.Assign (n, t) ->
           let (ctx', r) = eval (ctx, t) in
